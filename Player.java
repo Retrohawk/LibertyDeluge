@@ -1,8 +1,7 @@
 
 public class Player extends Sprite {
 	private String name;
-	private int x;
-	private int y;
+	public final int MOVESPEED = 3;
 	
 	public Player() {
 		this("", 100,100);
@@ -15,26 +14,20 @@ public class Player extends Sprite {
 	}
 	public Player(String name, int x, int y) {
 		this.name = name;
-		this.x = x;
-		this.y = y;
-	}
-	public int getX() {
-		return x;
-	}
-	public int getY() {
-		return y;
+		this.setX(x);
+		this.setY(y);
 	}
 	public void moveRight() {
-		this.x += 1;
+		this.setX(this.getX() + MOVESPEED);
 	}
 	public void moveLeft() {
-		this.x -= 1;
+		this.setX(this.getX() - MOVESPEED);
 	}
 	public void moveUp() {
-		this.y -= 1;
+		this.setY(this.getY() - MOVESPEED);
 	}
 	public void moveDown() {
-		this.y += 1;
+		this.setY(this.getY() + MOVESPEED);
 	}
 	public String getName() {
 		return this.name;
