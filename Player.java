@@ -14,7 +14,9 @@ public class Player extends Sprite {
 		this("", x, y);
 	}
 	public Player(String name, int x, int y) {
-		
+		this.name = name;
+		this.x = x;
+		this.y = y;
 	}
 	public int getX() {
 		return x;
