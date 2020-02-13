@@ -1,13 +1,13 @@
 import java.util.ArrayList;
 
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
@@ -35,7 +35,15 @@ public class Deluge extends Application {
 		//I can't seem to get the play color correct.
 		gc.setFill(Paint.valueOf(p1.getColor().toString()));
 		gc.strokeOval(p1.getX(), p1.getY(), 10, 10);
+		gc.strokeLine(p1.getX(), p1.getY(), p1.getAim()[0], p1.getAim()[1]);
 		gc.getCanvas().setFocusTraversable(true);
+		gc.getCanvas().addEventFilter(MouseEvent.MOUSE_MOVED, m -> {	
+			p1.setAim(Math.round(m.getX()),	Math.round(m.getY()));
+			gc.clearRect(0, 0, board.getHeight(), board.getWidth());
+			gc.setStroke((Paint) p1.getColor());
+			gc.strokeOval(p1.getX()-5, p1.getY()-5, 10, 10);
+			gc.strokeLine(p1.getX(), p1.getY(), p1.getAim()[0], p1.getAim()[1]);
+		});
 		gc.getCanvas().addEventFilter(KeyEvent.ANY, k -> {
 			gc.getCanvas().requestFocus();
 			if (k.getCode()==KeyCode.W) {
@@ -61,10 +69,10 @@ public class Deluge extends Application {
 			if (k.getCode()==KeyCode.SPACE) {
 				//shoot that muthafucka
 			}
-			System.out.println(p1.getX());
 			gc.clearRect(0, 0, board.getHeight(), board.getWidth());
 			gc.setStroke((Paint) p1.getColor());
-			gc.strokeOval(p1.getX(), p1.getY(), 10, 10);
+			gc.strokeOval(p1.getX()-5, p1.getY()-5, 10, 10);
+			gc.strokeLine(p1.getX(), p1.getY(), p1.getAim()[0], p1.getAim()[1]);
 		});
 		
 		Stage myStage = new Stage();

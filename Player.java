@@ -2,7 +2,7 @@
 public class Player extends Sprite {
 	private String name;
 	public final int MOVESPEED = 3;
-	
+	private long[] aimAt = {0,0};
 	public Player() {
 		this("", 100,100);
 	}
@@ -32,4 +32,12 @@ public class Player extends Sprite {
 	public String getName() {
 		return this.name;
 	}
+	public void setAim(long x, long y) {
+		this.aimAt[0] = x;
+		this.aimAt[1] = y;
+	}
+	public long[] getAim() {
+		return aimAt;
+	}
+	
 }
