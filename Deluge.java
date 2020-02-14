@@ -59,7 +59,8 @@ public class Deluge extends Application {
 					if ((Math.abs(z.getX()-p1.getX()) <= 2) && (Math.abs(z.getY()-p1.getY()) <= 2)) {
 						System.out.println("You've been devoured!");
 						REFRESH_SCREEN.stop();
-						return;
+						System.out.printf("Score: %d%n", zombieBag.size());
+						return; //Game over, man.
 					}
 				}
 				
@@ -72,10 +73,10 @@ public class Deluge extends Application {
 	
 		//Add a zombie to the board every five seconds
 		Timeline ZOMBIE_CREATOR = new Timeline();
-		ZOMBIE_CREATOR.setCycleCount(5000); //Not sure what this does honestly.
+		//ZOMBIE_CREATOR.setCycleCount(5000); //Not sure what this does honestly.
 		EventHandler<ActionEvent> onFinishedZ = new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent a) {
-				Zombie z = new Zombie(4);
+				Zombie z = new Zombie();
 				z.setColor(Color.GREENYELLOW);
 				zombieBag.add(z);
 				ZOMBIE_CREATOR.playFromStart();

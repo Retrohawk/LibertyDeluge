@@ -1,8 +1,14 @@
-
+import java.security.SecureRandom;
 public class Zombie extends Sprite {
 	private int speed;
 	private Player currentTarget;
 	
+	public Zombie() {
+		SecureRandom RNG = new SecureRandom();
+		this.setX(5);
+		this.setY(5);
+		this.speed = RNG.nextInt(4) + 1;
+	}
 	public Zombie(int speed) {
 		this.setX(5);
 		this.setY(5);
