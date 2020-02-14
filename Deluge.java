@@ -23,8 +23,8 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class Deluge extends Application {
-	final int MAX_X = 500;
-	final int MAX_Y = 500;
+	final int MAX_X = 800;
+	final int MAX_Y = 800;
 	
 	final int ZOMBIE_RATE = 5000;
 	final Canvas board = new Canvas(MAX_X, MAX_Y);
@@ -46,20 +46,23 @@ public class Deluge extends Application {
 		REFRESH_SCREEN.setCycleCount(50);
 		EventHandler<ActionEvent> onFinished = new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent a) {
-				System.out.println("Refresh Handler");
 				gc.clearRect(0, 0, board.getHeight(), board.getWidth());
 				gc.setStroke((Paint) p1.getColor());
 				gc.strokeOval(p1.getX()-5, p1.getY()-5, 10, 10);
 				gc.setStroke((Paint) Color.LIGHTPINK);
 				gc.strokeLine(p1.getX(), p1.getY(), p1.getAim()[0], p1.getAim()[1]);
-				System.out.println("Size of zBag: " + zombieBag.size());
 				for (Zombie z : zombieBag) {
 					z.setTarget(p1); //maybe zombie needs a getClosest method to find closest player
-					System.out.println(z.getX() + " : " + z.getY());
 					z.stalk();
 					gc.setStroke((Paint) z.getColor());
 					gc.strokeOval(z.getX()-5, z.getY()-5, 10, 10);
+					if ((Math.abs(z.getX()-p1.getX()) <= 2) && (Math.abs(z.getY()-p1.getY()) <= 2)) {
+						System.out.println("You've been devoured!");
+						REFRESH_SCREEN.stop();
+						return;
+					}
 				}
+				
 				REFRESH_SCREEN.playFromStart();
 			}
 		};
@@ -72,7 +75,7 @@ public class Deluge extends Application {
 		ZOMBIE_CREATOR.setCycleCount(5000); //Not sure what this does honestly.
 		EventHandler<ActionEvent> onFinishedZ = new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent a) {
-				Zombie z = new Zombie(2);
+				Zombie z = new Zombie(4);
 				z.setColor(Color.GREENYELLOW);
 				zombieBag.add(z);
 				ZOMBIE_CREATOR.playFromStart();
@@ -101,7 +104,7 @@ public class Deluge extends Application {
 				//shoot?
 			}
 		});
-		gc.getCanvas().addEventFilter(KeyEvent.ANY, k -> {
+		gc.getCanvas().addEventFilter(KeyEvent.KEY_PRESSED, k -> {
 			gc.getCanvas().requestFocus();
 			if (k.getCode()==KeyCode.W) {
 				if (p1.getY() - p1.MOVESPEED > 0) {
