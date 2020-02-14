@@ -1,6 +1,6 @@
 
 public class Player extends Sprite {
-	private String name;
+	public String name;
 	public final int MOVESPEED = 3;
 	private long[] aimAt = {0,0};
 	public Player() {

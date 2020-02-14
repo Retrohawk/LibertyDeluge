@@ -1,9 +1,10 @@
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
 
+import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -19,10 +20,12 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 public class Deluge extends Application {
 	final int MAX_X = 500;
 	final int MAX_Y = 500;
+	
 	final int ZOMBIE_RATE = 5000;
 	final Canvas board = new Canvas(MAX_X, MAX_Y);
 	final GraphicsContext gc = board.getGraphicsContext2D();
@@ -32,37 +35,58 @@ public class Deluge extends Application {
 		launch(args);
 	}
 	@Override public void start(Stage primaryStage) {
+		
 		Stage myStage = new Stage();
 		myStage.setTitle("Liberty Swarm");
 		BorderPane pane = new BorderPane();
-		Player p1 = new Player(400,400);
+		Player p1 = new Player("Gorge",400,400);
 		p1.setColor(Color.WHITE);
-		Timer timer = new Timer();
-		timer.scheduleAtFixedRate(new TimerTask() {
-			@Override
-			public void run() {
+		Timeline REFRESH_SCREEN = new Timeline();
+		
+		REFRESH_SCREEN.setCycleCount(50);
+		EventHandler<ActionEvent> onFinished = new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent a) {
+				System.out.println("Refresh Handler");
 				gc.clearRect(0, 0, board.getHeight(), board.getWidth());
 				gc.setStroke((Paint) p1.getColor());
 				gc.strokeOval(p1.getX()-5, p1.getY()-5, 10, 10);
 				gc.setStroke((Paint) Color.LIGHTPINK);
 				gc.strokeLine(p1.getX(), p1.getY(), p1.getAim()[0], p1.getAim()[1]);
-				gc.setStroke((Paint) Color.GREENYELLOW);
+				System.out.println("Size of zBag: " + zombieBag.size());
 				for (Zombie z : zombieBag) {
-					z.setTarget(p1);
+					z.setTarget(p1); //maybe zombie needs a getClosest method to find closest player
+					System.out.println(z.getX() + " : " + z.getY());
 					z.stalk();
-					System.out.println(z.getX() + " " + z.getY());
+					gc.setStroke((Paint) z.getColor());
 					gc.strokeOval(z.getX()-5, z.getY()-5, 10, 10);
 				}
+				REFRESH_SCREEN.playFromStart();
 			}
-		}, 0, 60);
-		
+		};
+		KeyFrame keyFrame = new KeyFrame(Duration.millis(60), onFinished);
+		REFRESH_SCREEN.getKeyFrames().add(keyFrame);
+		REFRESH_SCREEN.play();
+	
 		//Add a zombie to the board every five seconds
-		timer.scheduleAtFixedRate(new TimerTask() {
-			@Override
-			public void run() {
-				zombieBag.add(new Zombie(ZOMBIE_RATE));
+		Timeline ZOMBIE_CREATOR = new Timeline();
+		ZOMBIE_CREATOR.setCycleCount(5000); //Not sure what this does honestly.
+		EventHandler<ActionEvent> onFinishedZ = new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent a) {
+				Zombie z = new Zombie(2);
+				z.setColor(Color.GREENYELLOW);
+				zombieBag.add(z);
+				ZOMBIE_CREATOR.playFromStart();
 			}
-		}, 0, 5000);
+		};
+		KeyFrame keyFrameZ = new KeyFrame(Duration.millis(5000), onFinishedZ);
+		ZOMBIE_CREATOR.getKeyFrames().add(keyFrameZ);
+		ZOMBIE_CREATOR.play();
+		
+		
+		
+		
+		
+		
 		gc.setStroke((Paint) p1.getColor());
 		gc.setFill((Paint) p1.getColor());
 		gc.fillOval(p1.getX(), p1.getY(), 10, 10);
@@ -71,11 +95,6 @@ public class Deluge extends Application {
 		gc.getCanvas().setFocusTraversable(true);
 		gc.getCanvas().addEventFilter(MouseEvent.MOUSE_MOVED, m -> {	
 			p1.setAim(Math.round(m.getX()),	Math.round(m.getY()));
-			gc.clearRect(0, 0, board.getHeight(), board.getWidth());
-			gc.setStroke((Paint) p1.getColor());
-			gc.strokeOval(p1.getX()-5, p1.getY()-5, 10, 10);
-			gc.setStroke((Paint) Color.LIGHTPINK);
-			gc.strokeLine(p1.getX(), p1.getY(), p1.getAim()[0], p1.getAim()[1]);
 		});
 		gc.getCanvas().addEventFilter(MouseEvent.MOUSE_PRESSED, m -> {
 			if (m.getButton()==MouseButton.PRIMARY) {
@@ -103,21 +122,18 @@ public class Deluge extends Application {
 				if (p1.getX() - p1.MOVESPEED > 0) {
 					p1.moveLeft();
 				}
-			}
-			
-			gc.clearRect(0, 0, board.getHeight(), board.getWidth());
-			gc.setStroke((Paint) p1.getColor());
-			gc.strokeOval(p1.getX()-5, p1.getY()-5, 10, 10);
-			gc.strokeLine(p1.getX(), p1.getY(), p1.getAim()[0], p1.getAim()[1]);
-			
+			}		
 		});
 		
 		
 		pane.setBackground(new Background(new BackgroundFill(Color.rgb(0, 0, 25), CornerRadii.EMPTY, Insets.EMPTY)));
 		pane.setCenter(board);
 		myStage.setScene(new Scene(pane));
+		
+		
 		myStage.showAndWait();
-		timer.cancel();
+		REFRESH_SCREEN.stop();
+		ZOMBIE_CREATOR.stop();
 	}//End of start method
 	
 	
