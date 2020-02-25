@@ -1,6 +1,6 @@
 import javafx.scene.paint.Color;
 
-public class Sprite {
+public abstract class Sprite {
 	private boolean isAlive;
 	private Color color;
 	private int x;
